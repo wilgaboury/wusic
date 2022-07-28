@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+option go_package = "./proto";
+
+message Song {
+    string id = 1;
+    string name = 2;
+    repeated ArtistInfo artists = 3;
+    AlbumInfo album = 4;
+    int32 track = 5;
+}
+
+message ArtistInfo {
+    string id = 1;
+    string name = 2;
+}
+
+message AlbumInfo {
+    string id = 1;
+    string name = 2;
+}

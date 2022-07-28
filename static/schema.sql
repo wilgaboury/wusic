@@ -1,27 +1,27 @@
 CREATE TABLE songs (
-    id binary(128),
+    id varchar(36),
     name varchar(255),
-    album binary(128),
-    track_number integer,
-    realease binary(128)
+    album varchar(36),
+    track integer,
+    realease varchar(36)
 );
 
 CREATE TABLE artists (
-    id binary(128),
+    id varchar(36),
     name varchar(255),
 );
 
 CREATE TABLE album (
-    id binary(128),
+    id varchar(36),
     name varchar(255),
 );
 
 CREATE TABLE song_artists (
-    song_id binary(128),
-    artist_id binary(128),
+    song_id varchar(36),
+    artist_id varchar(36),
 );
 
 CREATE TABLE artist_albums (
-    artist_id binary(128),
-    album_id binary(128),
+    artist_id varchar(36),
+    album_id varchar(36),
 );
