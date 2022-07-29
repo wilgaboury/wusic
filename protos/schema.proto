@@ -5,7 +5,8 @@ option go_package = "./protos";
 package schema;
 
 message Error {
-    string message = 1;
+    string title = 1;
+    string details = 2;
 }
 
 message Song {

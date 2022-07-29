@@ -12,6 +12,7 @@ type params struct {
 	Port      int    `json:"port"`
 	RunSetup  bool   `json:"run_setup"`
 	RunServer bool   `json:"run_server"`
+	SendStack bool   `json:"send_stack"`
 }
 
 var Params params
@@ -22,6 +23,7 @@ func DefaultParams() params {
 		Port:      8080,
 		RunSetup:  true,
 		RunServer: true,
+		SendStack: true,
 	}
 }
 
@@ -49,6 +51,7 @@ func InitParams() {
 	port := flag.Int("port", Params.Port, "port for the server")
 	runSetup := flag.Bool("run-setup", Params.RunSetup, "runs setup data syncing processes")
 	runServer := flag.Bool("run-server", Params.RunServer, "runs the rest server")
+	sendStack := flag.Bool("send-stack", Params.SendStack, "on error a stack trace will be sent")
 	flag.Parse()
 
 	Params = params{
@@ -56,5 +59,6 @@ func InitParams() {
 		Port:      *port,
 		RunSetup:  *runSetup,
 		RunServer: *runServer,
+		SendStack: *sendStack,
 	}
 }

@@ -10,7 +10,7 @@ func NewRouter() http.Handler {
 	r := chi.NewRouter()
 
 	r.Get("/", EmptyHandler)
-	r.Get("/songTest", ProtoHandler(HandleSong))
+	r.Get("/songTest", HandleSong)
 
 	return r
 }
