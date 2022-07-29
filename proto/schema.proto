@@ -2,12 +2,34 @@ syntax = "proto3";
 
 option go_package = "./proto";
 
+package schema;
+
 message Song {
     string id = 1;
     string name = 2;
     repeated ArtistInfo artists = 3;
     AlbumInfo album = 4;
     int32 track = 5;
+}
+
+message Artist {
+    string id = 1;
+    string name = 2;
+    repeated SongInfo songs = 3;
+    repeated AlbumInfo albums = 4;
+}
+
+message Album {
+    string id = 1;
+    string name = 2;
+    repeated SongInfo songs = 3;
+    repeated ArtistInfo artists = 4;
+}
+
+message SongInfo {
+    string id = 1;
+    string name = 2;
+    int32 track = 3;
 }
 
 message ArtistInfo {
@@ -18,4 +40,21 @@ message ArtistInfo {
 message AlbumInfo {
     string id = 1;
     string name = 2;
+}
+
+message Playlist {
+    string id = 1;
+    string name = 2;
+    repeated PlaylistItem items = 3;
+}
+
+message PlaylistItem {
+    string id = 1;
+    enum Type {
+        SONG = 0;
+        ALBUM = 1;
+        PLAYLIST = 2;
+    }
+    Type type = 2;
+
 }
