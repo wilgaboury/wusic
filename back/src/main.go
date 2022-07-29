@@ -7,11 +7,17 @@ import (
 )
 
 func main() {
-	cmd := NewCmd()
-	config := cmd.Config()
-	s := http.Server{
-		Addr:    net.JoinHostPort(config.Host, strconv.Itoa(config.Port)),
-		Handler: NewRouter(),
+	InitParams()
+
+	if Params.RunSetup {
+		// run setup
 	}
-	s.ListenAndServe()
+
+	if Params.RunServer {
+		s := http.Server{
+			Addr:    net.JoinHostPort(Params.Host, strconv.Itoa(Params.Port)),
+			Handler: NewRouter(),
+		}
+		s.ListenAndServe()
+	}
 }
