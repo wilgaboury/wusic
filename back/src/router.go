@@ -1,12 +1,16 @@
 package main
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/go-chi/chi/v5"
+)
 
 func NewRouter() http.Handler {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("ok"))
-	})
-	return mux
+	r := chi.NewRouter()
+
+	r.Get("/", EmptyHandler)
+	r.Get("/songTest", ProtoHandler(HandleSong))
+
+	return r
 }

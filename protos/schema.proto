@@ -1,8 +1,12 @@
 syntax = "proto3";
 
-option go_package = "./proto";
+option go_package = "./protos";
 
 package schema;
+
+message Error {
+    string message = 1;
+}
 
 message Song {
     string id = 1;

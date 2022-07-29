@@ -2,8 +2,8 @@ makeDir := $(dir $(abspath $(firstword $(MAKEFILE_LIST))))
 
 output = $(makeDir)/.build
 goDir = $(makeDir)/back/src
-goProtoDir = $(goDir)/proto
-protoDir = $(makeDir)/proto
+goProtoDir = $(goDir)/protos
+protoDir = $(makeDir)/protos
 
 .PHONY: clean proto
 
@@ -12,15 +12,15 @@ build: makeOutputDir server copyStatic
 makeOutputDir:
 	mkdir -p $(output)
 
-server: protoGo $(goDir)/**
+server: protosGo $(goDir)/**
 	(cd $(goDir) && go build -o $(output)/server)
 
 copyStatic: ./static/**
 	cp -r ./static $(output)/static
 
-proto: protoGo
+protos: protosGo
 
-protoGo: $(protoDir)/**
+protosGo: $(protoDir)/**
 	protoc -I=$(protoDir) --go_out=$(goDir) $(protoDir)/**
 
 clean:
