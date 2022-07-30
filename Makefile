@@ -7,7 +7,7 @@ protoDir = $(makeDir)/protos
 
 .PHONY: clean proto
 
-build: makeOutputDir server copyStatic
+install: makeOutputDir server copyStatic
 
 makeOutputDir:
 	mkdir -p $(output)
