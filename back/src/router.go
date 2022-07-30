@@ -9,8 +9,7 @@ import (
 func NewRouter() http.Handler {
 	r := chi.NewRouter()
 
-	r.Get("/", EmptyHandler)
-	r.Get("/songTest", HandleSong)
+	r.Get("/songs")
 
 	return r
 }

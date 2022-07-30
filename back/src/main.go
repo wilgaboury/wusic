@@ -1,13 +1,21 @@
 package main
 
 import (
+	"log"
 	"net"
 	"net/http"
 	"strconv"
 )
 
+func CheckErrFatal(err error) {
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 func main() {
 	InitParams()
+	InitDb()
 
 	if Params.RunSetup {
 		// run setup
