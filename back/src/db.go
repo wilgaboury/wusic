@@ -16,10 +16,10 @@ func InitDb() {
 	CheckErrFatal(err)
 
 	f, err := os.OpenFile(filepath.Join(Params.DbDir, "db.sqlite"), os.O_RDONLY|os.O_CREATE, 0666)
-	CheckErrFatal(err)
 	f.Close()
+	CheckErrFatal(err)
 
-	Db, err := sql.Open("sqlite3", Params.DbDir)
+	Db, err := sql.Open("sqlite3", filepath.Join(Params.DbDir, "db.sqlite"))
 	CheckErrFatal(err)
 
 	rsql, err := os.Open("./static/schema.sql")
@@ -32,5 +32,3 @@ func InitDb() {
 	_, err = Db.Exec(string(sql))
 	CheckErrFatal(err)
 }
-
-func DbToSong(r sql.Row)

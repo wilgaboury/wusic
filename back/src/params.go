@@ -22,7 +22,7 @@ func DefaultParams() params {
 	return params{
 		Host:      "",
 		Port:      8080,
-		DbDir:     "~/.wusic",
+		DbDir:     "./",
 		RunSetup:  true,
 		RunServer: true,
 		SendStack: true,

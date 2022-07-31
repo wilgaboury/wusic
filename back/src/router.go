@@ -10,17 +10,21 @@ import (
 func NewRouter() http.Handler {
 	r := chi.NewRouter()
 
-	r.Get("/songs", EmptyHandler)
-	r.With(SongContext).Get("/song/{id}", GetSongsHandler)
-	r.With(ProtoMiddleware[*protos.Song]).Post("/song", EmptyHandler)
+	r.With(ProtoMiddleware[*protos.ApiGetAll]).Get("/songs", GetSongsHandler)
+	r.With(ProtoMiddleware[*protos.ApiGet]).Get("/song", GetSongHandler)
+	r.With(ProtoMiddleware[*protos.Songs]).Post("/song", OkHandler)
 
-	r.Get("/artists", EmptyHandler)
-	r.Get("/artist/{id}", EmptyHandler)
-	r.With(ProtoMiddleware[*protos.Artist]).Post("/artist", EmptyHandler)
+	r.With(ProtoMiddleware[*protos.ApiGetAll]).Get("/artists", OkHandler)
+	r.With(ProtoMiddleware[*protos.ApiGet]).Get("/artist", OkHandler)
+	r.With(ProtoMiddleware[*protos.Artists]).Post("/artist", OkHandler)
 
-	r.Get("/album", EmptyHandler)
-	r.Get("/album/{id}", EmptyHandler)
-	r.With(ProtoMiddleware[*protos.Album]).Post("/album", EmptyHandler)
+	r.With(ProtoMiddleware[*protos.ApiGetAll]).Get("/albums", OkHandler)
+	r.With(ProtoMiddleware[*protos.ApiGet]).Get("/album", OkHandler)
+	r.With(ProtoMiddleware[*protos.Albums]).Post("/album", OkHandler)
+
+	r.With(ProtoMiddleware[*protos.ApiGetAll]).Get("/playlists", OkHandler)
+	r.With(ProtoMiddleware[*protos.ApiGet]).Get("/playlist", OkHandler)
+	r.With(ProtoMiddleware[*protos.Playlists]).Post("/playlist", OkHandler)
 
 	return r
 }

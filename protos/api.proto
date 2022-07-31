@@ -2,7 +2,9 @@ syntax = "proto3";
 
 option go_package = "./protos";
 
-package schema;
+package api;
+
+import "google/protobuf/timestamp.proto";
 
 message Error {
     string title = 1;
@@ -61,5 +63,28 @@ message PlaylistItem {
         PLAYLIST = 2;
     }
     Type type = 2;
+}
 
+message ApiGet {
+    repeated string ids = 1;
+}
+
+message ApiGetAll {
+    repeated google.protobuf.Timestamp time = 1;
+}
+
+message Songs {
+    repeated Song songs = 1;
+}
+
+message Albums {
+    repeated Album albums = 1;
+}
+
+message Artists {
+    repeated Artist artists = 1;
+}
+
+message Playlists {
+    repeated Playlist playlists = 1;
 }
