@@ -32,3 +32,5 @@ func InitDb() {
 	_, err = Db.Exec(string(sql))
 	CheckErrFatal(err)
 }
+
+func DbToSong(r sql.Row)
