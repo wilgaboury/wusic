@@ -53,27 +53,53 @@ func OkHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("ok"))
 }
 
-func GetSongsHandler(w http.ResponseWriter, r *http.Request) {
-	OkHandler(w, r)
+func GetSongHandler(w http.ResponseWriter, r *http.Request) {
+	m := r.Context().Value(MessageBodyKey).(*protos.ApiGet)
+	ss, err := DbGetSongs(r.Context(), m.Ids)
+	if err != nil {
+		WriteErr(w, err.Error())
+		return
+	}
+
+	b, err := proto.Marshal(&protos.Songs{Songs: ss})
+	if err != nil {
+		panic(err)
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(b)
 }
 
-func GetSongHandler(w http.ResponseWriter, r *http.Request) {
-	// m := r.Context().Value(MessageBodyKey).(*protos.ApiGet)
+func GetArtistHandler(w http.ResponseWriter, r *http.Request) {
+	m := r.Context().Value(MessageBodyKey).(*protos.ApiGet)
+	arts, err := DbGetArtists(r.Context(), m.Ids)
+	if err != nil {
+		WriteErr(w, err.Error())
+		return
+	}
 
-	// ss, err := DbGetSongs(r.Context(), m.Ids)
-	// if err != nil {
-	// 	WriteErr(w, err.Error())
-	// 	return
-	// }
+	b, err := proto.Marshal(&protos.Artists{Artists: arts})
+	if err != nil {
+		panic(err)
+	}
 
-	// b, err := proto.Marshal(ss)
-	// if err != nil {
-	// 	WriteErr(w, err.Error())
-	// 	return
-	// }
+	w.WriteHeader(http.StatusOK)
+	w.Write(b)
+}
 
-	// w.WriteHeader(http.StatusOK)
-	// w.Write(b)
+func GetAlbumHandler(w http.ResponseWriter, r *http.Request) {
+	m := r.Context().Value(MessageBodyKey).(*protos.ApiGet)
+	albs, err := DbGetAlbums(r.Context(), m.Ids)
+	if err != nil {
+		WriteErr(w, err.Error())
+		return
+	}
 
-	OkHandler(w, r)
+	b, err := proto.Marshal(&protos.Albums{Albums: albs})
+	if err != nil {
+		panic(err)
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(b)
 }

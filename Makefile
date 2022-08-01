@@ -4,6 +4,7 @@ output = $(makeDir)/.build
 goDir = $(makeDir)/back/src
 goProtoDir = $(goDir)/protos
 protoDir = $(makeDir)/protos
+staticDir = $(makeDir)/static
 
 .PHONY: clean proto
 

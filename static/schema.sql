@@ -1,8 +1,8 @@
 CREATE TABLE songs (
     id TEXT PRIMARY KEY,
     name TEXT,
-    album TEXT,
     track INTEGER,
+    album TEXT,
 );
 
 CREATE TABLE artists (
