@@ -10,7 +10,7 @@ CREATE TABLE artists (
     name TEXT,
 );
 
-CREATE TABLE album (
+CREATE TABLE albums (
     id TEXT PRIMARY KEY,
     name TEXT,
 );
@@ -36,3 +36,4 @@ CREATE TABLE playlist_items {
     type TEXT,
     track INTEGER,
 };
+

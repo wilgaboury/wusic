@@ -15,7 +15,7 @@ func CheckErrFatal(err error) {
 
 func main() {
 	InitParams()
-	InitDb()
+	// InitDb()
 
 	if Params.RunSetup {
 		// run setup

@@ -2,11 +2,9 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"runtime"
-	"strings"
 
 	"github.com/wilgaboury/wusic/protos"
 	"google.golang.org/protobuf/proto"
@@ -59,48 +57,23 @@ func GetSongsHandler(w http.ResponseWriter, r *http.Request) {
 	OkHandler(w, r)
 }
 
-func StrArrToAnyArr(a []string) []any {
-	ret := make([]any, len(a))
-	for i, v := range a {
-		ret[i] = v
-	}
-	return ret
-}
-
-func QuestionMarkStr(I int) string {
-	qs := make([]string, I)
-	for i := 0; i < I; i++ {
-		qs[i] = "?"
-	}
-	return strings.Join(qs, ",")
-}
-
 func GetSongHandler(w http.ResponseWriter, r *http.Request) {
-	m := r.Context().Value(MessageBodyKey).(*protos.ApiGet)
+	// m := r.Context().Value(MessageBodyKey).(*protos.ApiGet)
 
-	sql := fmt.Sprintf(`
-		SELECT (s.id, s.name, s.album, a.name, s.track)
-		FROM songs AS s
-		LEFT JOIN albums AS a ON s.album = a.id
-		WHERE id IN (%s)
-	`, QuestionMarkStr(len(m.Ids)))
+	// ss, err := DbGetSongs(r.Context(), m.Ids)
+	// if err != nil {
+	// 	WriteErr(w, err.Error())
+	// 	return
+	// }
 
-	rs, err := Db.QueryContext(r.Context(), sql, StrArrToAnyArr(m.Ids)...)
-	if err != nil {
-		WriteErr(w, "sql error")
-		return
-	}
-	defer rs.Close()
+	// b, err := proto.Marshal(ss)
+	// if err != nil {
+	// 	WriteErr(w, err.Error())
+	// 	return
+	// }
 
-	ret := &protos.Songs{}
-	for rs.Next() {
-		i := &protos.Song{}
-		rs.Scan(i.Id, i.Name, i.Album.Id, i.Album.Name, i.Track)
-		ret.Songs = append(ret.Songs, i)
-	}
+	// w.WriteHeader(http.StatusOK)
+	// w.Write(b)
 
-	var b []byte
-	proto.Unmarshal(b, ret)
-	w.WriteHeader(http.StatusOK)
-	w.Write(b)
+	OkHandler(w, r)
 }
