@@ -10,14 +10,14 @@ goFiles = $(shell find $(goDir) -type f)
 staticFiles = $(shell find $(staticDir) -type f)
 protoFiles = $(shell find $(protoDir) -type f)
 
-.PHONY: clean proto
+.PHONY: install clean proto
 
-install: $(output) server copyStatic
+install: $(output) $(output)/server $(output)/static
 
 $(output):
 	mkdir -p $(output)
 
-$(output)/server: protosGo $(goFiles)
+$(output)/server: $(goProtoDir) $(goFiles)
 	(cd $(goDir) && go build -o $(output)/server)
 
 $(output)/static: $(staticFiles)
