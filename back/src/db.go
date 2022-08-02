@@ -28,7 +28,7 @@ func InitDb() {
 	exeLoc, err := os.Executable()
 	CheckErrPanic(err)
 
-	sql, err := os.ReadFile(filepath.Join(exeLoc, "./static/schema.sql"))
+	sql, err := os.ReadFile(filepath.Join(exeLoc, "..", "static", "schema.sql"))
 	CheckErrPanic(err)
 
 	_, err = Db.Exec(string(sql))
