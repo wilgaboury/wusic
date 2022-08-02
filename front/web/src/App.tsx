@@ -4,8 +4,6 @@ import styles from './App.module.css';
 
 import videojs from 'video.js';
 
-import Hls from 'hls.js';
-
 declare module "solid-js" {
   namespace JSX {
     interface IntrinsicElements {
@@ -16,21 +14,6 @@ declare module "solid-js" {
 
 
 const App: Component = () => {
-  // onMount(() => {
-  //   let video = document.getElementById('my-player') as HTMLVideoElement;
-  //   let videoSrc = 'http://localhost:9090/playlist.m3u8';
-  //   console.log("fuck my life");
-
-  //   if (Hls.isSupported()) {
-  //     var hls = new Hls();
-  //     hls.loadSource(videoSrc);
-  //     hls.attachMedia(video);
-  //   }
-  //   else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-  //     video.src = videoSrc;
-  //   }
-  // })
-
   onMount(() => {
     let player = videojs('my-player');
     player.src({
@@ -41,8 +24,8 @@ const App: Component = () => {
   })
 
   return (
-    <div /*class={styles.App}*/>
-      {/* <header class={styles.header}> */}
+    <div class={styles.App}>
+      <header class={styles.header}>
         {/* <img src={logo} class={styles.logo} alt="logo" />
         <p>
           Edit <code>src/App.tsx</code> and save to reload.
@@ -62,15 +45,8 @@ const App: Component = () => {
           preload="auto" 
           width="640" 
           height="268"
-        >
-          {/* <source src="http://localhost:9090/playlist.m3u8" type="application/x-mpegURL"/> */}
-        </video-js>
-        {/* <video 
-          id="my-player"
-          width="640" 
-          height="268"
-        /> */}
-      {/* </header> */}
+        />
+      </header>
     </div>
   );
 };
