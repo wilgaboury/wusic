@@ -7,3 +7,4 @@ services:
     - '9090:80'
     volumes:
     - ${DB_DIR}/songs:/usr/local/apache2/htdocs
+    - ./httpd.conf:/usr/local/apache2/conf/httpd.conf
