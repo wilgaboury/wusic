@@ -17,7 +17,7 @@ const App: Component = () => {
   onMount(() => {
     let player = videojs('my-player');
     player.src({
-      src: "http://localhost:9090/1/playlist.m3u8",
+      src: "http://localhost:9090/2/master.m3u8",
       type: "application/x-mpegURL"
     });
     player.show()
@@ -44,7 +44,7 @@ const App: Component = () => {
           controls 
           preload="auto" 
           width="640" 
-          height="268"
+          height="30"
         />
       </header>
     </div>
