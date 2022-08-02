@@ -10,6 +10,8 @@ import (
 func NewRouter() http.Handler {
 	r := chi.NewRouter()
 
+	r.Get("/", OkHandler)
+
 	r.With(ProtoMiddleware[*protos.ApiGetAll]).Get("/songs", OkHandler)
 	r.With(ProtoMiddleware[*protos.ApiGet]).Get("/song", GetSongHandler)
 	r.With(ProtoMiddleware[*protos.Songs]).Post("/song", OkHandler)

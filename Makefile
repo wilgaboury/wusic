@@ -1,27 +1,31 @@
 makeDir := $(dir $(abspath $(firstword $(MAKEFILE_LIST))))
 
-output = $(makeDir)/.build
-goDir = $(makeDir)/back/src
+output = $(makeDir).build
+goDir = $(makeDir)back/src
 goProtoDir = $(goDir)/protos
-protoDir = $(makeDir)/protos
-staticDir = $(makeDir)/static
+protoDir = $(makeDir)protos
+staticDir = $(makeDir)static
+
+goFiles = $(shell find $(goDir) -type f)
+staticFiles = $(shell find $(staticDir) -type f)
+protoFiles = $(shell find $(protoDir) -type f)
 
 .PHONY: clean proto
 
-install: makeOutputDir server copyStatic
+install: $(output) server copyStatic
 
-makeOutputDir:
+$(output):
 	mkdir -p $(output)
 
-server: protosGo $(goDir)/**
+$(output)/server: protosGo $(goFiles)
 	(cd $(goDir) && go build -o $(output)/server)
 
-copyStatic: ./static/**
-	cp -r ./static $(output)/static
+$(output)/static: $(staticFiles)
+	cp -rf $(staticDir) $(output)
 
-protos: protosGo
+protos: $(goProtoDir)
 
-protosGo: $(protoDir)/**
+$(goProtoDir): $(protoFiles)
 	protoc -I=$(protoDir) --go_out=$(goDir) $(protoDir)/**
 
 clean:

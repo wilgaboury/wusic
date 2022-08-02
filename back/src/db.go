@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -17,24 +16,23 @@ var Db *sql.DB
 
 func InitDb() {
 	err := os.MkdirAll(filepath.Join(Params.DbDir, "songs"), os.ModePerm)
-	CheckErrFatal(err)
+	CheckErrPanic(err)
 
 	f, err := os.OpenFile(filepath.Join(Params.DbDir, "db.sqlite"), os.O_RDONLY|os.O_CREATE, 0666)
 	f.Close()
-	CheckErrFatal(err)
+	CheckErrPanic(err)
 
 	Db, err := sql.Open("sqlite3", filepath.Join(Params.DbDir, "db.sqlite"))
-	CheckErrFatal(err)
+	CheckErrPanic(err)
 
-	rsql, err := os.Open("./static/schema.sql")
-	CheckErrFatal(err)
-	defer rsql.Close()
+	exeLoc, err := os.Executable()
+	CheckErrPanic(err)
 
-	sql, err := io.ReadAll(rsql)
-	CheckErrFatal(err)
+	sql, err := os.ReadFile(filepath.Join(exeLoc, "./static/schema.sql"))
+	CheckErrPanic(err)
 
 	_, err = Db.Exec(string(sql))
-	CheckErrFatal(err)
+	CheckErrPanic(err)
 }
 
 const GetSongSql = `

@@ -5,6 +5,7 @@ import (
 	"flag"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 )
 
 type params struct {
@@ -19,10 +20,15 @@ type params struct {
 var Params params
 
 func DefaultParams() params {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		panic(err)
+	}
+
 	return params{
 		Host:      "",
 		Port:      8080,
-		DbDir:     "./",
+		DbDir:     filepath.Join(homeDir, ".wusic"),
 		RunSetup:  true,
 		RunServer: true,
 		SendStack: true,
