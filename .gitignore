@@ -1,4 +1,3 @@
 .build/
 back/src/protos/
 back/apache/.env
-front/web/src/protos/

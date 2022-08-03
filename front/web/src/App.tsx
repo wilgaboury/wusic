@@ -8,6 +8,7 @@ const App: Component = () => {
   return (
     <div class={styles.App}>
       <header class={styles.header}>
+        <div style="flex-grow: 1"/>
         <AudioPlayer/>
       </header>
     </div>
