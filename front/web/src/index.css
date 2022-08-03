@@ -11,3 +11,25 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.video-js .vjs-big-play-button {
+  display: none;
+}
+.video-js .vjs-control-bar {
+  display: flex;
+  position: relative;
+  background-color: transparent;
+}
+
+.video-js .vjs-text-track-display {
+  display: none;
+}
+
+.video-js {
+  font-size: 0.6em;
+  background-color: transparent;
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
+  width: 100%;
+}
