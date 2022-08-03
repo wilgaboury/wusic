@@ -19,6 +19,7 @@
     "@videojs/http-streaming": "^2.14.2",
     "hls.js": "^1.2.0",
     "solid-js": "^1.4.7",
+    "ts-proto": "^1.121.1",
     "video.js": "^7.20.1"
   }
 }

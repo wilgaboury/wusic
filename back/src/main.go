@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net"
 	"net/http"
 	"strconv"
@@ -21,8 +22,10 @@ func main() {
 	}
 
 	if Params.RunServer {
+		addr := net.JoinHostPort(Params.Host, strconv.Itoa(Params.Port))
+		fmt.Printf("starting rest server on %s", addr)
 		s := http.Server{
-			Addr:    net.JoinHostPort(Params.Host, strconv.Itoa(Params.Port)),
+			Addr:    addr,
 			Handler: NewRouter(),
 		}
 		s.ListenAndServe()
