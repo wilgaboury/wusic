@@ -2,7 +2,7 @@ import { Component } from 'solid-js';
 
 import styles from './App.module.css';
 
-import AudioPlayer from './AudioPlayer';
+import { AudioPlayer } from './AudioPlayer';
 
 const App: Component = () => {
   return (

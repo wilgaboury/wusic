@@ -12,23 +12,6 @@ code {
     monospace;
 }
 
-.video-js .vjs-big-play-button {
-  display: none;
-}
-.video-js .vjs-control-bar {
-  display: flex;
-  position: relative;
-  background-color: transparent;
-}
-
-.video-js .vjs-text-track-display {
-  display: none;
-}
-
-.video-js .vjs-current-time {
-  display: unset;
-}
-
 .video-js {
   font-size: 16px;
   background-color: transparent;
@@ -39,4 +22,30 @@ code {
   max-width: 1200px;
   height: unset;
   width: unset;
+}
+
+.video-js .vjs-control-bar {
+  display: flex;
+  position: relative;
+  background-color: transparent;
+}
+
+.video-js .vjs-play-control {
+  /* display: none; */
+}
+
+.video-js .vjs-big-play-button {
+  display: none;
+}
+
+.video-js .vjs-text-track-display {
+  display: none;
+}
+
+.video-js .vjs-volume-panel {
+  /* display: none; */
+}
+
+.video-js .vjs-current-time {
+  display: unset;
 }

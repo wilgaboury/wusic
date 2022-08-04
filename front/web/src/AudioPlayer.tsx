@@ -1,8 +1,9 @@
-import { Component, onMount } from 'solid-js';
+import { Component, onMount, createEffect } from 'solid-js';
 
 import videojs from 'video.js';
 
 import styles from './AudioPlayer.module.css';
+import { audioSource } from './global';
 
 declare module "solid-js" {
     namespace JSX {
@@ -12,12 +13,9 @@ declare module "solid-js" {
     }
 }
 
-let player: null | videojs.Player = null;
+export let player: undefined | videojs.Player = undefined;
 
-const AudioPlayer: Component = () => {
-    let prevButton: null | videojs.Component = null;
-    let nextButton: null | videojs.Component = null;
-
+export const AudioPlayer: Component = () => {
     onMount(() => {
         player = videojs('audio-player', {
             controlBar: {
@@ -27,24 +25,24 @@ const AudioPlayer: Component = () => {
             controls: true,
             preload: "auto",
             bigPlayButton: false,
-            
         });
-
-        prevButton = player.controlBar.addChild('Button');
-        prevButton.el().innerHTML = '❮';
-
-        nextButton = player.controlBar.addChild('Button');
-        nextButton.el().innerHTML = '❯';
-
-        player.controlBar.el().prepend(prevButton.el());
-        player.controlBar.el().insertBefore(nextButton.el(), player.controlBar.getChild('volumePanel')?.el() ?? null);
-
-        player.src({
-            src: "http://localhost:9090/2/master.m3u8",
-            type: "application/x-mpegURL"
-        });
+        if (audioSource() !== '') {
+            player.src({
+                src: audioSource(),
+                type: "application/x-mpegURL",
+            });
+        }
         player.show();
     });
+
+    createEffect(() => {
+        if (player !== undefined && audioSource() !== '') {
+            player.src({
+                src: audioSource(),
+                type: "application/x-mpegURL",
+            });
+        }
+    })
 
     return (
         <div class={styles.BottomPlayerBarContainer}>
@@ -55,5 +53,3 @@ const AudioPlayer: Component = () => {
         </div>
     );
 }
-
-export default AudioPlayer;
