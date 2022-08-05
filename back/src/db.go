@@ -8,9 +8,37 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/golang/protobuf/proto"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/wilgaboury/wusic/protos"
 )
+
+type IderMessage interface {
+	proto.Message
+	GetId() string
+}
+
+func MergeIders[T IderMessage](arr []T) []T {
+	m := make(map[string]T)
+
+	for _, v := range arr {
+		if _, ok := m[v.GetId()]; ok {
+			m[v.GetId()] = v
+		} else {
+			proto.Merge(m[v.GetId()], v)
+		}
+	}
+
+	ret := make([]T, 0, len(m))
+	for _, v := range arr {
+		if _, ok := m[v.GetId()]; ok {
+			ret = append(ret, m[v.GetId()])
+		}
+		delete(m, v.GetId())
+	}
+
+	return ret
+}
 
 var Db *sql.DB
 
@@ -43,6 +71,8 @@ const GetSongSql = `
 	LEFT JOIN artists ON songs_artists.song_id = artists.id
 `
 
+const GetSongOrderSql = "ORDER BY songs.id, artists.id"
+
 func StrArrToAnyArr(strs []string) []any {
 	ret := make([]any, len(strs))
 	for i := range strs {
@@ -51,21 +81,72 @@ func StrArrToAnyArr(strs []string) []any {
 	return ret
 }
 
+func RowToSong(rs *sql.Rows) (*protos.Song, error) {
+	s := &protos.Song{}
+	alb := &protos.AlbumInfo{}
+	art := &protos.ArtistInfo{}
+
+	err := rs.Scan(&s.Id, &s.Name, &s.Track, &alb.Id, &alb.Name, &art.Id, &art.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	if alb.Id != "" {
+		s.Album = alb
+	}
+
+	if art.Id != "" {
+		s.Artists = []*protos.ArtistInfo{art}
+	}
+
+	return s, nil
+}
+
+func DbGetAllSongs(ctx context.Context) ([]*protos.Song, error) {
+	sql := fmt.Sprintf(`%s %s`, GetSongSql, GetSongOrderSql)
+
+	rs, err := Db.QueryContext(ctx, sql)
+	if err != nil {
+		return nil, err
+	}
+	defer rs.Close()
+
+	ss := make(map[string]*protos.Song)
+
+	for rs.Next() {
+		s, err := RowToSong(rs)
+		if err != nil {
+			return nil, err
+		}
+
+		if _, ok := ss[s.Id]; ok {
+			ss[s.Id] = s
+		} else {
+			proto.Merge(ss[s.Id], s)
+		}
+	}
+
+	ret := make([]*protos.Song, 0, len(ss))
+	for _, v := range ss {
+		ret = append(ret, v)
+	}
+
+	return ret, nil
+}
+
 func DbGetSongs(ctx context.Context, ids []string) ([]*protos.Song, error) {
 	qs := make([]string, len(ids))
 	for i := range ids {
 		qs[i] = "?"
 	}
 
-	sql := fmt.Sprintf(`
-		%s
-		WHERE songs.id IN (%s)
-	`, GetSongSql, strings.Join(qs, ","))
+	sql := fmt.Sprintf("%s WHERE songs.id IN (%s) %s", GetSongSql, strings.Join(qs, ","), GetSongOrderSql)
 
 	rs, err := Db.QueryContext(ctx, sql, StrArrToAnyArr(ids)...)
 	if err != nil {
 		return nil, err
 	}
+	defer rs.Close()
 
 	idToIdx := make(map[string]int)
 	for i, id := range ids {
@@ -75,11 +156,7 @@ func DbGetSongs(ctx context.Context, ids []string) ([]*protos.Song, error) {
 	ss := make([]*protos.Song, len(ids))
 
 	for rs.Next() {
-		s := &protos.Song{}
-		alb := &protos.AlbumInfo{}
-		art := &protos.ArtistInfo{}
-
-		err := rs.Scan(&s.Id, &s.Name, &s.Track, &alb.Id, &alb.Name, &art.Id, &art.Name)
+		s, err := RowToSong(rs)
 		if err != nil {
 			return nil, err
 		}
@@ -89,20 +166,12 @@ func DbGetSongs(ctx context.Context, ids []string) ([]*protos.Song, error) {
 		if ss[i] == nil {
 			ss[i] = s
 		} else {
-			s = ss[i]
+			proto.Merge(ss[i], s)
 		}
+	}
 
-		if s.Album == nil && alb.Id != "" {
-			s.Album = alb
-		}
-
-		if s.Artists == nil && art.Id != "" {
-			s.Artists = make([]*protos.ArtistInfo, 0)
-		}
-
-		if art.Id != "" {
-			s.Artists = append(s.Artists, art)
-		}
+	for _, s := range ss {
+		s.Artists = MergeIders(s.Artists)
 	}
 
 	return ss, nil

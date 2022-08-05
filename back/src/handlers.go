@@ -2,11 +2,13 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"runtime"
 
 	"github.com/wilgaboury/wusic/protos"
+	"google.golang.org/protobuf/encoding/prototext"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -51,6 +53,24 @@ func WriteErr(w http.ResponseWriter, m string) {
 func OkHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("ok"))
+}
+
+func GetAllSongsHandler(w http.ResponseWriter, r *http.Request) {
+	ss, err := DbGetAllSongs(r.Context())
+	if err != nil {
+		WriteErr(w, err.Error())
+		return
+	}
+
+	b, err := proto.Marshal(&protos.Songs{Songs: ss})
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Print(prototext.Format(&protos.Songs{Songs: ss}))
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(b)
 }
 
 func GetSongHandler(w http.ResponseWriter, r *http.Request) {

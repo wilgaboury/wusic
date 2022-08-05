@@ -34,7 +34,13 @@ webProto: $(webProtoDir)
 
 $(webProtoDir): $(protoFiles)
 	mkdir $(webProtoDir)
-	protoc -I=$(protoDir) --plugin=$(protoTsPlugin) --ts_proto_out=$(webProtoDir) --ts_proto_opt=esModuleInterop=true $(protoFiles)
+	protoc \
+		-I=$(protoDir) \
+		--plugin=$(protoTsPlugin) \
+		--ts_proto_out=$(webProtoDir) \
+		--ts_proto_opt=esModuleInterop=true \
+		$(protoFiles)
+#		--ts_proto_opt=useOptionals=all \
 
 clean:
 	rm -rf $(output)
