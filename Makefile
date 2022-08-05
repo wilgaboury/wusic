@@ -19,6 +19,7 @@ install: $(output) $(output)/server $(output)/static
 $(output):
 	mkdir -p $(output)
 
+# TODO this is building when it is not out of date
 $(output)/server: $(goProtoDir) $(goFiles)
 	(cd $(goDir) && go build -o $(output)/server)
 
