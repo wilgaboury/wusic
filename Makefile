@@ -18,10 +18,11 @@ install: $(output) $(output)/server $(output)/static
 
 $(output):
 	mkdir -p $(output)
+	touch $(output)
 
-# TODO this is building when it is not out of date
 $(output)/server: $(goProtoDir) $(goFiles)
 	(cd $(goDir) && go build -o $(output)/server)
+	touch $(output)/server
 
 $(output)/static: $(staticFiles)
 	cp -rf $(staticDir) $(output)
@@ -31,22 +32,22 @@ proto: $(goProtoDir) $(webProtoDir)
 
 $(goProtoDir): $(protoFiles)
 	mkdir -p $(goProtoDir)
-	touch $(goProtoDir)
 	protoc -I=$(protoDir) --go_out=$(goDir) $(protoDir)/**
+	touch $(goProtoDir)
 
 webProto: $(webProtoDir)
 
 $(webProtoDir): $(protoFiles)
 	mkdir -p $(webProtoDir)
-	touch $(webProtoDir)
 	protoc \
 		-I=$(protoDir) \
 		--plugin=$(protoTsPlugin) \
 		--ts_proto_out=$(webProtoDir) \
 		--ts_proto_opt=esModuleInterop=true \
 		$(protoFiles)
+	touch $(webProtoDir)
 
 clean:
 	rm -rf $(output)
 	rm -rf $(goProtoDir)
-	rm -rf $(webProtoDir)/**
+	rm -rf $(webProtoDir)
