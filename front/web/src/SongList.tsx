@@ -1,4 +1,5 @@
 import { Component, createResource, For } from "solid-js";
+import { audioSource, setAudioSource } from "./global";
 import host from "./host";
 import * as api from "./protos/api";
 
@@ -12,7 +13,11 @@ const fetchSongs = async (ids: string[]) => {
 
 const Song: Component<{song: api.Song}> = (props) => {
     return (
-        <div class={styles.SongCard}>
+        <div 
+            class={styles.SongCard}
+            onclick={() => {
+                setAudioSource(`http://localhost:9090/${props.song.id}/master.m3u8`);
+            }}>
             <span>{props.song.name ?? "<Missing Name>"}</span>
         </div>
     );
@@ -23,9 +28,11 @@ const SongList: Component = () => {
     console.log(host);
 
     return (
-        <For each={songs() ?? []}>{(song, i) =>
-            <Song song = {song}/>
-        }</For>
+        <div class={styles.SongListContainer}>
+            <For each={songs() ?? []}>{(song, i) =>
+                <Song song = {song}/>
+            }</For>
+        </div>
     );
 }
 
