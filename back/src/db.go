@@ -50,7 +50,7 @@ func InitDb() {
 	f.Close()
 	CheckErrPanic(err)
 
-	Db, err := sql.Open("sqlite3", filepath.Join(Params.DbDir, "db.sqlite"))
+	Db, err = sql.Open("sqlite3", filepath.Join(Params.DbDir, "db.sqlite"))
 	CheckErrPanic(err)
 
 	exeLoc, err := os.Executable()
@@ -64,7 +64,7 @@ func InitDb() {
 }
 
 const GetSongSql = `
-	SELECT (songs.id, songs.name, songs.track, albums.id, albums.name, artists.id, artists.name)
+	SELECT songs.id, songs.name, songs.track, albums.id, albums.name, artists.id, artists.name
 	FROM songs
 	LEFT JOIN albums ON songs.album = albums.id
 	LEFT JOIN songs_artists ON songs.id = songs_artists.song_id

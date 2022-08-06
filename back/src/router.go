@@ -24,7 +24,7 @@ func NewRouter() http.Handler {
 
 	r.Get("/", OkHandler)
 
-	r.Post("/songs", GetAllSongsHandler)
+	r.Get("/songs", GetAllSongsHandler)
 	r.With(ProtoMiddleware[*protos.ApiGet]).Post("/song", GetSongHandler)
 	r.With(ProtoMiddleware[*protos.Songs]).Post("/song", OkHandler)
 
