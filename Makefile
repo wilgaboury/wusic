@@ -25,25 +25,28 @@ $(output)/server: $(goProtoDir) $(goFiles)
 
 $(output)/static: $(staticFiles)
 	cp -rf $(staticDir) $(output)
+	touch $(output)/static
 
 proto: $(goProtoDir) $(webProtoDir)
 
 $(goProtoDir): $(protoFiles)
+	mkdir -p $(goProtoDir)
+	touch $(goProtoDir)
 	protoc -I=$(protoDir) --go_out=$(goDir) $(protoDir)/**
 
 webProto: $(webProtoDir)
 
 $(webProtoDir): $(protoFiles)
-	mkdir $(webProtoDir)
+	mkdir -p $(webProtoDir)
+	touch $(webProtoDir)
 	protoc \
 		-I=$(protoDir) \
 		--plugin=$(protoTsPlugin) \
 		--ts_proto_out=$(webProtoDir) \
 		--ts_proto_opt=esModuleInterop=true \
 		$(protoFiles)
-#		--ts_proto_opt=useOptionals=all \
 
 clean:
 	rm -rf $(output)
 	rm -rf $(goProtoDir)
-	rm -rf $(webProtoDir)
+	rm -rf $(webProtoDir)/**
