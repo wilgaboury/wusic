@@ -2,13 +2,11 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"runtime"
 
 	"github.com/wilgaboury/wusic/protos"
-	"google.golang.org/protobuf/encoding/prototext"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -66,8 +64,6 @@ func GetAllSongsHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-
-	fmt.Print(prototext.Format(&protos.Songs{Songs: ss}))
 
 	w.WriteHeader(http.StatusOK)
 	w.Write(b)

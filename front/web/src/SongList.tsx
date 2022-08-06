@@ -1,14 +1,13 @@
 import { Component, createResource, For } from "solid-js";
+import host from "./host";
 import * as api from "./protos/api";
 
 import styles from './SongList.module.css';
 
 const fetchSongs = async (ids: string[]) => {
-    const response = await fetch('http://localhost:8080', {method: 'GET'});
-    const body = await response.blob();
-    const body2 = await body.arrayBuffer()
-    console.log(new Uint8Array(body2));
-    return api.Songs.decode(new Uint8Array(body2)).songs ?? [];
+    const response = await fetch('http://localhost:8080/songs', {method: 'GET'});
+    const body = await response.arrayBuffer();
+    return api.Songs.decode(new Uint8Array(body)).songs ?? [];
 }
 
 const Song: Component<{song: api.Song}> = (props) => {
@@ -21,6 +20,7 @@ const Song: Component<{song: api.Song}> = (props) => {
 
 const SongList: Component = () => {
     const [songs, {mutate: mutateSongs, refetch: refetchSongs}] = createResource(fetchSongs);
+    console.log(host);
 
     return (
         <For each={songs() ?? []}>{(song, i) =>

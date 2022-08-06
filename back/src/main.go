@@ -17,6 +17,10 @@ func main() {
 	InitParams()
 	InitDb()
 
+	// songs, _ := DbGetAllSongs(context.Background())
+	// fmt.Println("SONGS:")
+	// fmt.Println(prototext.Format(&protos.Songs{Songs: songs}))
+
 	if Params.RunSetup {
 		// run setup
 	}

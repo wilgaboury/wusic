@@ -11,6 +11,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/wilgaboury/wusic/protos"
+	"google.golang.org/protobuf/encoding/prototext"
 )
 
 type IderMessage interface {
@@ -61,6 +62,18 @@ func InitDb() {
 
 	_, err = Db.Exec(string(sql))
 	CheckErrPanic(err)
+
+	rs, _ := Db.Query(`
+	SELECT songs.id, songs.name
+	FROM songs
+	WHERE songs.id = 1
+	`)
+
+	rs.Next()
+	s := &protos.SongInfo{}
+	rs.Scan(&s.Id, &s.Name)
+
+	fmt.Println(prototext.Format(s))
 }
 
 const GetSongSql = `
@@ -91,6 +104,8 @@ func RowToSong(rs *sql.Rows) (*protos.Song, error) {
 		return nil, err
 	}
 
+	fmt.Println(prototext.Format(s))
+
 	if alb.Id != "" {
 		s.Album = alb
 	}
@@ -105,7 +120,10 @@ func RowToSong(rs *sql.Rows) (*protos.Song, error) {
 func DbGetAllSongs(ctx context.Context) ([]*protos.Song, error) {
 	sql := fmt.Sprintf(`%s %s`, GetSongSql, GetSongOrderSql)
 
+	fmt.Println(sql)
+
 	rs, err := Db.QueryContext(ctx, sql)
+
 	if err != nil {
 		return nil, err
 	}
@@ -113,8 +131,13 @@ func DbGetAllSongs(ctx context.Context) ([]*protos.Song, error) {
 
 	ss := make(map[string]*protos.Song)
 
+	fmt.Println(rs)
+
 	for rs.Next() {
+		fmt.Println("got here")
+
 		s, err := RowToSong(rs)
+
 		if err != nil {
 			return nil, err
 		}
@@ -124,6 +147,11 @@ func DbGetAllSongs(ctx context.Context) ([]*protos.Song, error) {
 		} else {
 			proto.Merge(ss[s.Id], s)
 		}
+	}
+
+	if rs.Err() != nil {
+		fmt.Println(rs.Err())
+		return nil, rs.Err()
 	}
 
 	ret := make([]*protos.Song, 0, len(ss))
