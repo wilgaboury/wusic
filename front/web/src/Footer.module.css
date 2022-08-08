@@ -1,0 +1,60 @@
+.FooterContainer {
+    background-color: var(--background-color-lighter);
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    box-sizing: border-box;
+    user-select: none;
+}
+
+.ControlsContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.ControlsContainer > :not(:first-child) {
+    margin-left: 15px;
+}
+
+.PlayButton {
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+    background-color: var(--text-color);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.PlayButton:hover {
+    transform: scale(1.05);
+}
+
+.PlayButton:active {
+    transform: scale(1);
+    background-color: var(--highlight-color-lighter);
+}
+
+.ControlButton {
+
+}
+
+.ControlButton:hover {
+    transform: scale(1.2);
+}
+
+.ControlButton:active {
+    transform: scale(1);
+    color: var(--highlight-color-lighter);
+}
+
+.ScrubContainer {
+    width: 100%;
+    max-width: 1200px;
+}

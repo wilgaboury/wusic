@@ -1,5 +1,19 @@
+:root {
+  --text-color: white;
+  --text-color-darker: silver;
+
+  --highlight-color-darker: #148aff;
+  --highlight-color: #3399ff;
+  --highlight-color-lighter: #66b3ff;
+  
+  --background-color: black;
+  --background-color-lighter: #101010;
+  --background-color-lighter2: #303030;
+}
+
 body {
   margin: 0;
+  color: var(--text-color);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
@@ -12,16 +26,16 @@ code {
     monospace;
 }
 
+.hover-scale:hover {
+  transform: scale(var(--hover-scale));
+}
+
 .video-js {
-  font-size: 16px;
-  background-color: transparent;
-  display: flex;
-  align-items: center;
-  flex-grow: 1;
   width: 100%;
-  max-width: 1200px;
+  font-size: 16px;
+  display: flex;
+  background-color: transparent;
   height: unset;
-  width: unset;
 }
 
 .video-js .vjs-control-bar {
@@ -31,7 +45,7 @@ code {
 }
 
 .video-js .vjs-play-control {
-  /* display: none; */
+  display: none;
 }
 
 .video-js .vjs-big-play-button {
@@ -43,7 +57,7 @@ code {
 }
 
 .video-js .vjs-volume-panel {
-  /* display: none; */
+  display: none;
 }
 
 .video-js .vjs-current-time {

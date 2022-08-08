@@ -1,5 +1,5 @@
 import { Component, createResource, For } from "solid-js";
-import { audioSource, setAudioSource } from "./global";
+import { currentSong, setCurrentSong } from "./global";
 import host from "./host";
 import * as api from "./protos/api";
 
@@ -16,7 +16,7 @@ const Song: Component<{song: api.Song}> = (props) => {
         <div 
             class={styles.SongCard}
             onclick={() => {
-                setAudioSource(`http://localhost:9090/${props.song.id}/master.m3u8`);
+                setCurrentSong(`http://localhost:9090/${props.song.id}/master.m3u8`);
             }}>
             <span>{props.song.name ?? "<Missing Name>"}</span>
         </div>
