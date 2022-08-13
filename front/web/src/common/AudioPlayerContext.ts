@@ -1,9 +1,13 @@
 import { createContext, createSignal, Signal } from "solid-js";
+import { Song } from "../protos/api";
 
-type AudioPlayerContextType = [src: Signal<string>, song: Signal<boolean>];
+export type AudioPlayerContextValue = [
+  src: Signal<Song>,
+  song: Signal<boolean>
+];
 
-export const makeAudioPlayerContext = (): AudioPlayerContextType => {
-  const [src, setSrc] = createSignal("");
+export const makeAudioPlayerContext = (): AudioPlayerContextValue => {
+  const [src, setSrc] = createSignal(Song.fromPartial({}));
   const [play, setPlay] = createSignal(false);
   return [
     [src, setSrc],
@@ -11,6 +15,8 @@ export const makeAudioPlayerContext = (): AudioPlayerContextType => {
   ];
 };
 
-export const AudioPlayerContext = createContext<AudioPlayerContextType>(
-  makeAudioPlayerContext()
+export const DefaultAudioPlayerContext = makeAudioPlayerContext();
+
+export const AudioPlayerContext = createContext<AudioPlayerContextValue>(
+  DefaultAudioPlayerContext
 );

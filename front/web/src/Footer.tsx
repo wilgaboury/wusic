@@ -1,12 +1,24 @@
-import { Component, createEffect, createSignal, onMount } from "solid-js";
+import {
+  Component,
+  createEffect,
+  createSignal,
+  onMount,
+  useContext,
+} from "solid-js";
 import videojs from "video.js";
+import { AudioPlayerContext } from "./common/AudioPlayerContext";
 
 import styles from "./Footer.module.css";
-import { currentSong } from "./global";
 
 export let player: undefined | videojs.Player = undefined;
 
+function interpSongUrl(id: string): string {
+  return `http://localhost:9090/songs/${id}/master.m3u8`;
+}
+
 export const AudioPlayer: Component = () => {
+  const [[src, _setSrc], _playSig] = useContext(AudioPlayerContext);
+
   onMount(() => {
     player = videojs("audio-player", {
       controlBar: {
@@ -17,9 +29,9 @@ export const AudioPlayer: Component = () => {
       preload: "auto",
       bigPlayButton: false,
     });
-    if (currentSong() !== "") {
+    if (src().id !== "") {
       player.src({
-        src: currentSong(),
+        src: interpSongUrl(src().id),
         type: "application/x-mpegURL",
       });
     }
@@ -27,9 +39,9 @@ export const AudioPlayer: Component = () => {
   });
 
   createEffect(() => {
-    if (player !== undefined && currentSong() !== "") {
+    if (player !== undefined && src().id !== "") {
       player.src({
-        src: currentSong(),
+        src: interpSongUrl(src().id),
         type: "application/x-mpegURL",
       });
     }
