@@ -15,8 +15,6 @@ export const makeAudioPlayerContext = (): AudioPlayerContextValue => {
   ];
 };
 
-export const DefaultAudioPlayerContext = makeAudioPlayerContext();
+export const DefaultAudioPlayerContextValue = makeAudioPlayerContext();
 
-export const AudioPlayerContext = createContext<AudioPlayerContextValue>(
-  DefaultAudioPlayerContext
-);
+export const AudioPlayerContext = createContext(DefaultAudioPlayerContextValue);

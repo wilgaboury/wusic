@@ -1,7 +1,10 @@
-import { createEffect } from "solid-js";
+import { createContext } from "solid-js";
 import { createStore, produce } from "solid-js/store";
 import { Song } from "../protos/api";
-import { AudioPlayerContextValue } from "./AudioPlayerContext";
+import {
+  AudioPlayerContextValue,
+  DefaultAudioPlayerContextValue,
+} from "./AudioPlayerContext";
 
 export interface AudioQueueContextValue {
   canNext: () => boolean;
@@ -21,17 +24,26 @@ export const makeAudioQueueContext = ([
 ]: AudioPlayerContextValue): AudioQueueContextValue => {
   const [state, setState] = createStore<AudioQueueState>({ songs: [], idx: 0 });
 
-  createEffect(() => {
-    setSrc(state.songs[state.idx]);
-  });
-
-  // TODO make this work correctly
-
   return {
     canNext: () => state.songs.length > 0 && state.idx < state.songs.length - 1,
-    next: () =>
-      setState(produce((s) => (s.idx = Math.min(s.songs.length, s.idx + 1)))),
+    next() {
+      if (this.canNext()) {
+        setState(produce((s) => (s.idx = Math.min(s.songs.length, s.idx + 1))));
+        setSrc(state.songs[state.idx]);
+      }
+    },
     canPrev: () => state.songs.length > 0 && state.idx > 0,
-    prev: () => setState(produce((s) => (s.idx = Math.max(0, s.idx - 1)))),
+    prev() {
+      if (this.canPrev()) {
+        setState(produce((s) => (s.idx = Math.max(0, s.idx - 1))));
+        setSrc(state.songs[state.idx]);
+      }
+    },
   };
 };
+
+export const DefaultAudioQueueContextValue = makeAudioQueueContext(
+  DefaultAudioPlayerContextValue
+);
+
+export const AudioPlayerContext = createContext(DefaultAudioQueueContextValue);
