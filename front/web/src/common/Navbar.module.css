@@ -1,0 +1,45 @@
+.Navbar {
+  width: 100%;
+  font-size: calc(2.5vmin);
+  display: flex;
+  justify-content: center;
+  user-select: none;
+  background-color: var(--background-color-lighter);
+}
+
+.Navbar > .NavbarItem:not(:first-child) {
+  margin-left: 20px;
+}
+
+.NavbarItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.NavbarItem:hover {
+  transform: scale(1.05);
+}
+
+.NavbarItem:active {
+  transform: scale(1);
+  color: var(--highlight-color);
+}
+
+.NavbarItemLine {
+  height: 0.1em;
+  background-color: var(--text-color-darker);
+  border-radius: 0.05em;
+  margin-top: 0.1em;
+  width: 1.25em;
+  transition: transform 250ms, background-color 250ms;
+}
+
+.NavbarItem:hover .NavbarItemLine {
+  animation-name: navbar-item-line-hover-anim;
+  transition: transform 250ms, background-color 250ms;
+  transform: scaleX(1.5);
+  background-color: var(--highlight-color);
+}

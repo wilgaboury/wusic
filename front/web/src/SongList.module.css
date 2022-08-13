@@ -1,21 +1,21 @@
 .SongCard {
-    display: flex;
-    padding: 10px;
-    background: black;
-    border-radius: 8px;
+  display: flex;
+  padding: 10px;
+  background: black;
+  border-radius: 8px;
 }
 
 .SongCard:not(:last-child) {
-    margin-bottom: 10px;
+  margin-bottom: 10px;
 }
 
 .SongCard:hover {
-    background: blue;
+  background: blue;
 }
 
 .SongListContainer {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    padding: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 50px;
 }
