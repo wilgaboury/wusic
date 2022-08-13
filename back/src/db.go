@@ -18,6 +18,48 @@ type IderMessage interface {
 	GetId() string
 }
 
+func DbGet[M IderMessage](baseSql, orderSql string, scanFunc func(rs *sql.Rows) (M, error), ctx context.Context, ids []string) ([]M, error) {
+	var sql string
+
+	if len(ids) > 0 {
+		sql = fmt.Sprintf("%s WHERE songs.id IN (%s) %s", baseSql, makeQmarkStr(len(ids)), orderSql)
+	} else {
+		sql = fmt.Sprintf("%s %s", baseSql, orderSql)
+	}
+
+	rs, err := Db.QueryContext(ctx, sql, StrArrToAnyArr(ids)...)
+	if err != nil {
+		return nil, err
+	}
+	defer rs.Close()
+
+	idToIdx := make(map[string]int)
+	for i, id := range ids {
+		idToIdx[id] = i
+	}
+
+	ms := make([]M, len(ids))
+
+	for rs.Next() {
+		m, err := scanFunc(rs)
+		if err != nil {
+			return nil, err
+		}
+
+		var i int
+		if _, ok := idToIdx[m.GetId()]; ok {
+			i = idToIdx[m.GetId()]
+			proto.Merge(ms[i], m)
+		} else {
+			i = len(ms)
+			idToIdx[m.GetId()] = i
+			ms = append(ms, m)
+		}
+	}
+
+	return ms, nil
+}
+
 func MergeIders[T IderMessage](arr []T) []T {
 	m := make(map[string]T)
 
@@ -61,6 +103,14 @@ func InitDb() {
 
 	_, err = Db.Exec(string(sql))
 	CheckErrPanic(err)
+}
+
+func makeQmarkStr(n int) string {
+	qs := make([]string, n)
+	for i := 0; i < n; i++ {
+		qs[i] = "?"
+	}
+	return strings.Join(qs, ",")
 }
 
 const GetSongSql = `
@@ -140,12 +190,13 @@ func DbGetAllSongs(ctx context.Context) ([]*protos.Song, error) {
 }
 
 func DbGetSongs(ctx context.Context, ids []string) ([]*protos.Song, error) {
-	qs := make([]string, len(ids))
-	for i := range ids {
-		qs[i] = "?"
-	}
+	var sql string
 
-	sql := fmt.Sprintf("%s WHERE songs.id IN (%s) %s", GetSongSql, strings.Join(qs, ","), GetSongOrderSql)
+	if len(ids) > 0 {
+		sql = fmt.Sprintf("%s WHERE songs.id IN (%s) %s", GetSongSql, makeQmarkStr(len(ids)), GetSongOrderSql)
+	} else {
+		sql = fmt.Sprintf("%s %s", GetSongSql, GetSongOrderSql)
+	}
 
 	rs, err := Db.QueryContext(ctx, sql, StrArrToAnyArr(ids)...)
 	if err != nil {
@@ -166,7 +217,14 @@ func DbGetSongs(ctx context.Context, ids []string) ([]*protos.Song, error) {
 			return nil, err
 		}
 
-		i := idToIdx[s.Id]
+		var i int
+		if _, ok := idToIdx[s.Id]; ok {
+			i = idToIdx[s.Id]
+		} else {
+			i = len(ss)
+			idToIdx[s.Id] = i
+			ss = append(ss, nil)
+		}
 
 		if ss[i] == nil {
 			ss[i] = s
@@ -182,8 +240,40 @@ func DbGetSongs(ctx context.Context, ids []string) ([]*protos.Song, error) {
 	return ss, nil
 }
 
+const GetArtistsSql = `
+	SELECT artists.id, artists.name, songs.id, songs.name, albums.id, albums.name
+	FROM artists
+	LEFT JOIN songs_artists ON artists.id = songs_artists.artist_id
+	LEFT JOIN songs ON songs_artists.song_id = songs.id
+	LEFT JOIN artists_albums ON artists.id = artists_albums.artist_id
+	LEFT JOIN albums ON artists_albums.album_id = albums.id
+`
+
+const GetArtistsOrderSql = "ORDER BY artists.id, songs.id, albums.id"
+
+func RowToArtist(rs *sql.Rows) (*protos.Artist, error) {
+	art := &protos.Artist{}
+	s := &protos.SongInfo{}
+	alb := &protos.AlbumInfo{}
+
+	err := rs.Scan(&art.Id, &art.Name, &s.Id, &s.Name, &alb.Id, &alb.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	if s.Id != "" {
+		art.Songs = []*protos.SongInfo{s}
+	}
+
+	if art.Id != "" {
+		art.Albums = []*protos.AlbumInfo{alb}
+	}
+
+	return art, nil
+}
+
 func DbGetArtists(ctx context.Context, ids []string) ([]*protos.Artist, error) {
-	return nil, nil
+
 }
 
 func DbGetAlbums(ctx context.Context, ids []string) ([]*protos.Album, error) {
