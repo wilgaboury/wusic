@@ -20,14 +20,19 @@ func ProtoMiddleware[M proto.Message](next http.Handler) http.Handler {
 			return
 		}
 
-		var m M
-		err = proto.Unmarshal(b, m)
-		if err != nil {
-			WriteErr(w, "Request body is not properly formatted")
-			return
+		ctx := r.Context()
+
+		if len(b) != 0 {
+			var m M
+			err = proto.Unmarshal(b, m)
+			if err != nil {
+				WriteErr(w, "Request body is not properly formatted")
+				return
+			}
+
+			ctx = context.WithValue(ctx, MessageBodyKey, &m)
 		}
 
-		ctx := context.WithValue(r.Context(), MessageBodyKey, &m)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
@@ -53,25 +58,21 @@ func OkHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("ok"))
 }
 
-func GetAllSongsHandler(w http.ResponseWriter, r *http.Request) {
-	ss, err := DbGetAllSongs(r.Context())
-	if err != nil {
-		WriteErr(w, err.Error())
-		return
-	}
-
-	b, err := proto.Marshal(&protos.Songs{Songs: ss})
-	if err != nil {
-		panic(err)
-	}
-
+func NotImplementedHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
-	w.Write(b)
+	w.Write([]byte("Not Yet Implemented"))
 }
 
 func GetSongHandler(w http.ResponseWriter, r *http.Request) {
-	m := r.Context().Value(MessageBodyKey).(*protos.ApiGet)
-	ss, err := DbGetSongs(r.Context(), m.Ids)
+	var ids []string
+
+	if m, ok := r.Context().Value(MessageBodyKey).(*protos.ApiGet); ok {
+		ids = m.Ids
+	} else {
+		ids = make([]string, 0)
+	}
+
+	ss, err := DbGetSongs(r.Context(), ids)
 	if err != nil {
 		WriteErr(w, err.Error())
 		return
@@ -87,14 +88,21 @@ func GetSongHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetArtistHandler(w http.ResponseWriter, r *http.Request) {
-	m := r.Context().Value(MessageBodyKey).(*protos.ApiGet)
-	arts, err := DbGetArtists(r.Context(), m.Ids)
+	var ids []string
+
+	if m, ok := r.Context().Value(MessageBodyKey).(*protos.ApiGet); ok {
+		ids = m.Ids
+	} else {
+		ids = make([]string, 0)
+	}
+
+	as, err := DbGetArtists(r.Context(), ids)
 	if err != nil {
 		WriteErr(w, err.Error())
 		return
 	}
 
-	b, err := proto.Marshal(&protos.Artists{Artists: arts})
+	b, err := proto.Marshal(&protos.Artists{Artists: as})
 	if err != nil {
 		panic(err)
 	}
@@ -104,14 +112,21 @@ func GetArtistHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetAlbumHandler(w http.ResponseWriter, r *http.Request) {
-	m := r.Context().Value(MessageBodyKey).(*protos.ApiGet)
-	albs, err := DbGetAlbums(r.Context(), m.Ids)
+	var ids []string
+
+	if m, ok := r.Context().Value(MessageBodyKey).(*protos.ApiGet); ok {
+		ids = m.Ids
+	} else {
+		ids = make([]string, 0)
+	}
+
+	as, err := DbGetAlbums(r.Context(), ids)
 	if err != nil {
 		WriteErr(w, err.Error())
 		return
 	}
 
-	b, err := proto.Marshal(&protos.Albums{Albums: albs})
+	b, err := proto.Marshal(&protos.Albums{Albums: as})
 	if err != nil {
 		panic(err)
 	}

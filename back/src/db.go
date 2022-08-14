@@ -8,9 +8,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/golang/protobuf/proto"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/wilgaboury/wusic/protos"
+	"google.golang.org/protobuf/proto"
 )
 
 type IderMessage interface {
@@ -18,11 +18,11 @@ type IderMessage interface {
 	GetId() string
 }
 
-func DbGet[M IderMessage](baseSql, orderSql string, scanFunc func(rs *sql.Rows) (M, error), ctx context.Context, ids []string) ([]M, error) {
+func DbGet[M IderMessage](tableName, baseSql, orderSql string, scanFunc func(rs *sql.Rows) (M, error), ctx context.Context, ids []string) ([]M, error) {
 	var sql string
 
 	if len(ids) > 0 {
-		sql = fmt.Sprintf("%s WHERE songs.id IN (%s) %s", baseSql, makeQmarkStr(len(ids)), orderSql)
+		sql = fmt.Sprintf("%s WHERE %s.id IN (%s) %s", baseSql, tableName, makeQmarkStr(len(ids)), orderSql)
 	} else {
 		sql = fmt.Sprintf("%s %s", baseSql, orderSql)
 	}
@@ -152,85 +152,10 @@ func RowToSong(rs *sql.Rows) (*protos.Song, error) {
 	return s, nil
 }
 
-func DbGetAllSongs(ctx context.Context) ([]*protos.Song, error) {
-	sql := fmt.Sprintf(`%s %s`, GetSongSql, GetSongOrderSql)
-
-	rs, err := Db.QueryContext(ctx, sql)
-	if err != nil {
-		return nil, err
-	}
-	defer rs.Close()
-
-	ss := make(map[string]*protos.Song)
-
-	for rs.Next() {
-		s, err := RowToSong(rs)
-
-		if err != nil {
-			return nil, err
-		}
-
-		if _, ok := ss[s.Id]; !ok {
-			ss[s.Id] = s
-		} else {
-			proto.Merge(ss[s.Id], s)
-		}
-	}
-
-	if rs.Err() != nil {
-		return nil, rs.Err()
-	}
-
-	ret := make([]*protos.Song, 0, len(ss))
-	for _, v := range ss {
-		ret = append(ret, v)
-	}
-
-	return ret, nil
-}
-
 func DbGetSongs(ctx context.Context, ids []string) ([]*protos.Song, error) {
-	var sql string
-
-	if len(ids) > 0 {
-		sql = fmt.Sprintf("%s WHERE songs.id IN (%s) %s", GetSongSql, makeQmarkStr(len(ids)), GetSongOrderSql)
-	} else {
-		sql = fmt.Sprintf("%s %s", GetSongSql, GetSongOrderSql)
-	}
-
-	rs, err := Db.QueryContext(ctx, sql, StrArrToAnyArr(ids)...)
+	ss, err := DbGet("songs", GetSongSql, GetSongOrderSql, RowToSong, ctx, ids)
 	if err != nil {
 		return nil, err
-	}
-	defer rs.Close()
-
-	idToIdx := make(map[string]int)
-	for i, id := range ids {
-		idToIdx[id] = i
-	}
-
-	ss := make([]*protos.Song, len(ids))
-
-	for rs.Next() {
-		s, err := RowToSong(rs)
-		if err != nil {
-			return nil, err
-		}
-
-		var i int
-		if _, ok := idToIdx[s.Id]; ok {
-			i = idToIdx[s.Id]
-		} else {
-			i = len(ss)
-			idToIdx[s.Id] = i
-			ss = append(ss, nil)
-		}
-
-		if ss[i] == nil {
-			ss[i] = s
-		} else {
-			proto.Merge(ss[i], s)
-		}
 	}
 
 	for _, s := range ss {
@@ -265,7 +190,7 @@ func RowToArtist(rs *sql.Rows) (*protos.Artist, error) {
 		art.Songs = []*protos.SongInfo{s}
 	}
 
-	if art.Id != "" {
+	if alb.Id != "" {
 		art.Albums = []*protos.AlbumInfo{alb}
 	}
 
@@ -273,9 +198,60 @@ func RowToArtist(rs *sql.Rows) (*protos.Artist, error) {
 }
 
 func DbGetArtists(ctx context.Context, ids []string) ([]*protos.Artist, error) {
+	as, err := DbGet("artists", GetArtistsSql, GetArtistsOrderSql, RowToArtist, ctx, ids)
+	if err != nil {
+		return nil, err
+	}
 
+	for _, a := range as {
+		a.Songs = MergeIders(a.Songs)
+		a.Albums = MergeIders(a.Albums)
+	}
+
+	return as, nil
+}
+
+const GetAlbumsSql = `
+	SELECT albums.id, albums.name, songs.id, songs.name, songs.track, artists.id, artists.name
+	FROM albums
+	JOIN LEFT songs ON albums.id = songs.album
+	JOIN LEFT artists_albums ON albums.id = artists_albums.album_id
+	JOIN LEFT artists ON artists_albums.artist_id = artists.id
+`
+
+const GetAlbumsOrderSql = "ORDER BY albums.id, songs.track, artists.id"
+
+func RowToAlbum(rs *sql.Rows) (*protos.Album, error) {
+	alb := &protos.Album{}
+	s := &protos.SongInfo{}
+	art := &protos.ArtistInfo{}
+
+	err := rs.Scan(&alb.Id, &alb.Name, &s.Id, &s.Name, &s.Track, &art.Id, &art.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	if s.Id != "" {
+		alb.Songs = []*protos.SongInfo{s}
+	}
+
+	if art.Id != "" {
+		alb.Artists = []*protos.ArtistInfo{art}
+	}
+
+	return alb, nil
 }
 
 func DbGetAlbums(ctx context.Context, ids []string) ([]*protos.Album, error) {
-	return nil, nil
+	as, err := DbGet("albums", GetAlbumsSql, GetAlbumsOrderSql, RowToAlbum, ctx, ids)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, a := range as {
+		a.Songs = MergeIders(a.Songs)
+		a.Artists = MergeIders(a.Artists)
+	}
+
+	return as, nil
 }
