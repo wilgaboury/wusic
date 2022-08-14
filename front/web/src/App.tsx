@@ -6,7 +6,7 @@ import {
   AudioPlayerContext,
   makeAudioPlayerContext,
 } from "./common/AudioPlayerContext";
-import { AudioPlayer } from "./Footer";
+import { AudioPlayer } from "./common/Footer";
 
 import ArtistsPage from "./player/ArtistsPage";
 

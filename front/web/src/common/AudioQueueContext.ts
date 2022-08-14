@@ -25,14 +25,18 @@ export const makeAudioQueueContext = ([
   const [state, setState] = createStore<AudioQueueState>({ songs: [], idx: 0 });
 
   return {
+    // eslint-disable-next-line
     canNext: () => state.songs.length > 0 && state.idx < state.songs.length - 1,
+    // eslint-disable-next-line
     next() {
       if (this.canNext()) {
         setState(produce((s) => (s.idx = Math.min(s.songs.length, s.idx + 1))));
         setSrc(state.songs[state.idx]);
       }
     },
+    // eslint-disable-next-line
     canPrev: () => state.songs.length > 0 && state.idx > 0,
+    // eslint-disable-next-line
     prev() {
       if (this.canPrev()) {
         setState(produce((s) => (s.idx = Math.max(0, s.idx - 1))));

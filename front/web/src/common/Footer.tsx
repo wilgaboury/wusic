@@ -6,7 +6,7 @@ import {
   useContext,
 } from "solid-js";
 import videojs from "video.js";
-import { AudioPlayerContext } from "./common/AudioPlayerContext";
+import { AudioPlayerContext } from "./AudioPlayerContext";
 
 import styles from "./Footer.module.css";
 

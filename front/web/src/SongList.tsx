@@ -1,7 +1,7 @@
 import { Component, createResource, For, useContext } from "solid-js";
 
 import { AudioPlayerContext } from "./common/AudioPlayerContext";
-import { host, restPort } from "./Host";
+import { host, restPort } from "./common/Host";
 import * as api from "./protos/api";
 import styles from "./SongList.module.css";
 
