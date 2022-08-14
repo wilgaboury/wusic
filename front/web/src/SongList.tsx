@@ -1,13 +1,13 @@
 import { Component, createResource, For, useContext } from "solid-js";
 
 import { AudioPlayerContext } from "./common/AudioPlayerContext";
-import host from "./host";
+import { host, restPort } from "./Host";
 import * as api from "./protos/api";
 import styles from "./SongList.module.css";
 
 const fetchSongs = async (ids: string[]) => {
-  const response = await fetch("http://localhost:8080/songs", {
-    method: "GET",
+  const response = await fetch(`http://${host}:${restPort}/songs`, {
+    method: "POST",
     body: api.ApiGet.encode({ ids: ids }).finish(),
   });
   const body = await response.arrayBuffer();
@@ -15,13 +15,13 @@ const fetchSongs = async (ids: string[]) => {
 };
 
 const Song: Component<{ song: api.Song }> = (props) => {
-  const [[_src, setSrc], [_play, _setPlay]] = useContext(AudioPlayerContext);
+  const [[_src, _setSrc], [_play, _setPlay]] = useContext(AudioPlayerContext);
 
   return (
     <div
       class={styles.SongCard}
       onClick={() => {
-        setSrc(`http://localhost:9090/${props.song.id}/master.m3u8`);
+        // setSrc(`http://${host}:${apachePort}/${props.song.id}/master.m3u8`);
       }}
     >
       <span>{props.song.name ?? "<Missing Name>"}</span>
