@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"runtime"
 
@@ -14,7 +14,7 @@ const MessageBodyKey string = "proto"
 
 func ProtoMiddleware[M proto.Message](next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		b, err := ioutil.ReadAll(r.Body)
+		b, err := io.ReadAll(r.Body)
 		if err != nil {
 			WriteErr(w, "IO error reading body of request")
 			return
