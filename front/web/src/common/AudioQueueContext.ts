@@ -11,6 +11,9 @@ export interface AudioQueueContextValue {
   next: () => void;
   canPrev: () => boolean;
   prev: () => void;
+  playNext: (songs: Song[]) => void;
+  addNext: (songs: Song[]) => void;
+  replace: (songs: Song[]) => void;
 }
 
 export interface AudioQueueState {
@@ -20,7 +23,7 @@ export interface AudioQueueState {
 
 export const makeAudioQueueContext = ([
   [_src, setSrc],
-  [_play, _setPlay],
+  [_play, setPlay],
 ]: AudioPlayerContextValue): AudioQueueContextValue => {
   const [state, setState] = createStore<AudioQueueState>({ songs: [], idx: 0 });
 
@@ -42,6 +45,21 @@ export const makeAudioQueueContext = ([
         setState(produce((s) => (s.idx = Math.max(0, s.idx - 1))));
         setSrc(state.songs[state.idx]);
       }
+    },
+    playNext: (songs: Song[]) =>
+      setState(produce((s) => s.songs.splice(s.idx, 0, ...songs))),
+    addNext: (songs: Song[]) =>
+      setState(produce((s) => s.songs.push(...songs))),
+    replace: (songs: Song[]) => {
+      setState(
+        produce((s) => {
+          s.songs = songs;
+          s.idx = 0;
+        })
+      );
+      setPlay(false);
+      if (songs.length == 0) setSrc(null);
+      else setSrc(songs[0]);
     },
   };
 };

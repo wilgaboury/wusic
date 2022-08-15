@@ -14,11 +14,7 @@ const fetchArtists = async () => {
 const ArtistsPage: Component = () => {
   const [artists, _] = createResource(fetchArtists);
 
-  return (
-    <For each={artists()}>{artist =>
-      <div>{artist.name}</div>
-    }</For>
-  );
+  return <For each={artists()}>{(artist) => <div>{artist.name}</div>}</For>;
 };
 
 export default ArtistsPage;
