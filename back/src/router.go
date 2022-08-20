@@ -25,6 +25,7 @@ func NewRouter() http.Handler {
 	r.Get("/", OkHandler)
 
 	r.With(ProtoMiddleware[*protos.ApiGet]).Post("/songs", GetSongHandler)
+	r.With(ProtoMiddleware[*protos.SongFile]).Post("/songFile", NotImplementedHandler)
 	r.With(ProtoMiddleware[*protos.Songs]).Post("/song", NotImplementedHandler)
 
 	r.With(ProtoMiddleware[*protos.ApiGet]).Post("/artists", GetArtistHandler)

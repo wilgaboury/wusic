@@ -26,8 +26,6 @@ CREATE TABLE IF NOT EXISTS songs_artists (
 CREATE TABLE IF NOT EXISTS artists_albums (
     artist_id TEXT,
     album_id TEXT,
-    UNIQUE(artist_id),
-    UNIQUE(album_id)
     -- FOREIGN KEY (artist_id) REFERENCES artists (id),
     -- FOREIGN KEY (album_id) REFERENCES albums (id)
 );

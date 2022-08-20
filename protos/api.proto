@@ -82,3 +82,8 @@ message Artists {
 message Playlists {
     repeated Playlist playlists = 1;
 }
+
+message SongFile {
+    bytes data = 1;
+    string ext = 2;
+}
