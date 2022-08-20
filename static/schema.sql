@@ -18,14 +18,14 @@ CREATE TABLE IF NOT EXISTS albums (
 
 CREATE TABLE IF NOT EXISTS songs_artists (
     song_id TEXT,
-    artist_id TEXT,
+    artist_id TEXT
     -- FOREIGN KEY (song_id) REFERENCES songs (id),
     -- FOREIGN KEY (artist_id) REFERENCES artists (id)
 );
 
 CREATE TABLE IF NOT EXISTS artists_albums (
     artist_id TEXT,
-    album_id TEXT,
+    album_id TEXT
     -- FOREIGN KEY (artist_id) REFERENCES artists (id),
     -- FOREIGN KEY (album_id) REFERENCES albums (id)
 );

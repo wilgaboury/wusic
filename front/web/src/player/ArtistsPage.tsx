@@ -1,14 +1,14 @@
 import { Component, createResource, For } from "solid-js";
 import { hostname, restPort } from "../common/Host";
-import { ApiGet, Artists, Artist } from "../protos/api";
+import { ApiGet, Artist, Artists } from "../protos/api";
 
 interface ArtistCardProps {
   artist: Artist;
 }
 
 export const ArtistCard: Component<ArtistCardProps> = (props) => {
-  return <div>{props.artist}</div>
-}
+  return <div>{props.artist.name}</div>;
+};
 
 const fetchArtists = async () => {
   const response = await fetch(`http://${hostname}:${restPort}/artists`, {
@@ -22,7 +22,9 @@ const fetchArtists = async () => {
 const ArtistsPage: Component = () => {
   const [artists, _] = createResource(fetchArtists);
 
-  return <For each={artists()}>{(artist) => <ArtistCard artist={artist}/>}</For>;
+  return (
+    <For each={artists()}>{(artist) => <ArtistCard artist={artist} />}</For>
+  );
 };
 
 export default ArtistsPage;
