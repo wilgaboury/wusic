@@ -255,3 +255,108 @@ func DbGetAlbums(ctx context.Context, ids []string) ([]*protos.Album, error) {
 
 	return as, nil
 }
+
+const SongUpsertSql string = `
+	INSERT INTO songs(id, name, track, album)
+	VALUES(?, ?, ?, ?)
+	ON CONFLICT(id) DO UPDATE SET
+	name = excluded.name
+	track = excluded.track
+	album = excluded.album
+`
+
+func UpsertSong(tx sql.Tx, s *protos.Song) error {
+	_, err := tx.Exec(SongUpsertSql, s.Id, s.Name, s.Track, s.Album)
+	if err != nil {
+		return err
+	}
+	for _, a := range s.Artists {
+		err := UpsertSongsArtists(tx, s.Id, a.Id)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+const ArtistUpsertSql string = `
+	INSERT INTO artists(id, name)
+	VALUES(?, ?)
+	ON CONFLICT (id) DO UPDATE SET
+	name = excluded.name
+`
+
+func UpsertArtist(tx sql.Tx, a *protos.Artist) error {
+	_, err := tx.Exec(ArtistUpsertSql, a.Id, a.Name)
+	if err != nil {
+		return err
+	}
+	for _, s := range a.Songs {
+		err := UpsertSongsArtists(tx, s.Id, a.Id)
+		if err != nil {
+			return err
+		}
+	}
+	for _, alb := range a.Albums {
+		err := UpsertArtistsAlbums(tx, a.Id, alb.Id)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+const AlbumUpsertSql string = `
+	INSERT INTO artists(id, name)
+	VALUES(?, ?)
+	ON CONFLICT (id) DO UPDATE SET
+	name = excluded.name
+`
+
+const SongsAlbumUpsertSql string = `
+	UPDATE songs SET
+	SET
+		album = ?
+		track = ?
+	WHERE id = ?
+`
+
+func UpsertAlbum(tx sql.Tx, a *protos.Album) error {
+	_, err := tx.Exec(AlbumUpsertSql, a.Id, a.Name)
+	if err != nil {
+		return err
+	}
+	for _, s := range a.Songs {
+		_, err := tx.Exec(SongsAlbumUpsertSql, a.Id, s.Track, s.Id)
+		if err != nil {
+			return err
+		}
+	}
+	for _, art := range a.Artists {
+		err := UpsertArtistsAlbums(tx, art.Id, a.Id)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+const SongsArtistsUpsertSql string = `
+	INSERT INTO songs_artists(song_id, artist_id)
+	VALUES (?, ?)
+`
+
+func UpsertSongsArtists(tx sql.Tx, sId, aId string) error {
+	_, err := tx.Exec(SongsArtistsUpsertSql, sId, aId)
+	return err
+}
+
+const ArtistsAlbumsUpsertSql string = `
+	INSERT INTO artists_albums(artist_id, album_id)
+	VALUES (?, ?)
+`
+
+func UpsertArtistsAlbums(tx sql.Tx, artId, albId string) error {
+	_, err := tx.Exec(ArtistsAlbumsUpsertSql, artId, albId)
+	return err
+}
