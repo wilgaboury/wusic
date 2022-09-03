@@ -1,4 +1,5 @@
 import { Component, createResource, For } from "solid-js";
+import { fetchGpb } from "../common/fetchUtil";
 import { hostname, restPort } from "../common/Host";
 import { ApiGet, Artist, Artists } from "../protos/api";
 
@@ -11,13 +12,8 @@ export const ArtistCard: Component<ArtistCardProps> = (props) => {
 };
 
 const fetchArtists = async () => {
-  const response = await fetch(`http://${hostname}:${restPort}/artists`, {
-    method: "POST",
-    body: ApiGet.encode({ ids: [] }).finish(),
-  });
-  const body = await response.arrayBuffer();
-  return Artists.decode(new Uint8Array(body)).artists ?? [];
-};
+  return await fetchGpb(`http://${hostname}:${restPort}/artists`, Artists.decode, ApiGet.encode, { ids: [] });
+}
 
 const ArtistsPage: Component = () => {
   const [artists, _] = createResource(fetchArtists);

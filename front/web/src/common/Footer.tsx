@@ -29,19 +29,14 @@ export const AudioPlayer: Component = () => {
       preload: "auto",
       bigPlayButton: false,
     });
-    if (src().id !== "") {
-      player.src({
-        src: interpSongUrl(src().id),
-        type: "application/x-mpegURL",
-      });
-    }
     player.show();
   });
 
   createEffect(() => {
-    if (player !== undefined && src().id !== "") {
+    const src0 = src();
+    if (player !== undefined && src0 != null && src0.id !== "") {
       player.src({
-        src: interpSongUrl(src().id),
+        src: interpSongUrl(src0.id),
         type: "application/x-mpegURL",
       });
     }

@@ -208,6 +208,8 @@ func DbGetArtists(ctx context.Context, ids []string) ([]*protos.Artist, error) {
 		a.Albums = MergeIders(a.Albums)
 	}
 
+	fmt.Println(len(as))
+
 	return as, nil
 }
 
