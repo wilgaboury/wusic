@@ -1,6 +1,8 @@
 # wusic
 project to build a self hosted music server, admin web ui, and player
 
+WARNING: this project is currently very half baked and not even close to being finished
+
 ## Currently Planned Tech Stack
 * server is simple rest api written in go using chi routing lib and sqlite3 backing database
 * rest api uses protobuf as exchange format
